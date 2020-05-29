@@ -96,7 +96,7 @@ def deleterow(tablename, item_id):  # delete a row in a table
     conn.close()
 
 
-def insertintotable(conn, query, value):
+def insertintotable(conn, query, value):  # insert new rows into the table
     cursor = conn.cursor()
     cursor.execute(query, value)
     conn.commit()
