@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>776</width>
+    <width>794</width>
     <height>526</height>
    </rect>
   </property>
@@ -65,29 +65,18 @@ font: 10pt &quot;MS Gothic&quot;;
            <string notr="true">border: 2px solid balck;</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Submit Date</string>
+           <item row="0" column="1">
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QLineEdit" name="lineEdit_submitdate"/>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Complete Status</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Project Name</string>
-             </property>
-            </widget>
+            </spacer>
            </item>
            <item row="0" column="3">
             <widget class="QLineEdit" name="lineEdit_projectname">
@@ -96,6 +85,20 @@ font: 10pt &quot;MS Gothic&quot;;
                <width>500</width>
                <height>0</height>
               </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Submit Date</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Project Name</string>
              </property>
             </widget>
            </item>
@@ -109,7 +112,7 @@ font: 10pt &quot;MS Gothic&quot;;
              </property>
              <property name="maximumSize">
               <size>
-               <width>69</width>
+               <width>100</width>
                <height>16777215</height>
               </size>
              </property>
@@ -129,8 +132,12 @@ border-radius: 2px 2px;</string>
              </item>
             </widget>
            </item>
-           <item row="1" column="3">
-            <widget class="QLineEdit" name="lineEdit_price"/>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Complete Status</string>
+             </property>
+            </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
@@ -139,18 +146,38 @@ border-radius: 2px 2px;</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="lineEdit_price"/>
+           </item>
+           <item row="2" column="3">
+            <widget class="QLineEdit" name="lineEdit_submitdate"/>
+           </item>
+           <item row="3" column="6">
+            <widget class="QComboBox" name="comboBox_paymentstatus">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToMinimumContentsLength</enum>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
+             <property name="minimumContentsLength">
+              <number>10</number>
              </property>
-            </spacer>
+             <item>
+              <property name="text">
+               <string>Pending</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Cleared</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="3" column="4">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Payment Staus</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

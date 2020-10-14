@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'explore_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.0
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -62,6 +62,7 @@ class Ui_Dialog(object):
         self.options.addItem("")
         self.options.addItem("")
         self.options.addItem("")
+        self.options.addItem("")
         self.horizontalLayout_2.addWidget(self.options)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
@@ -95,6 +96,7 @@ class Ui_Dialog(object):
         self.options.setItemText(6, _translate("Dialog", "Show Highest Individual worth: Project"))
         self.options.setItemText(7, _translate("Dialog", "Show Lowest Individual Worth: Project"))
         self.options.setItemText(8, _translate("Dialog", "Create Report of All Pending Jobs"))
-        self.options.setItemText(9, _translate("Dialog", "Create Report of All Jobs"))
+        self.options.setItemText(9, _translate("Dialog", "Create Report of All Jobs (with time factor)"))
+        self.options.setItemText(10, _translate("Dialog", "Show Pending Payments"))
         self.pushButton_cancel.setText(_translate("Dialog", "CANCEL"))
         self.pushButton_ok.setText(_translate("Dialog", "OK"))

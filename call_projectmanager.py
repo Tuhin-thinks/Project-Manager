@@ -1,5 +1,7 @@
+from package import edit_entries
+from package import project_manager
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QDialog, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QDialog, QPushButton, QInputDialog, QLineEdit
 from PyQt5.QtCore import pyqtSignal
 from PyQt5 import QtCore
 from package import explore_window
@@ -12,7 +14,7 @@ from package import add_ideas
 import threading
 import sqlite3
 from sqlite3 import Error
-from functools import partial
+from functools import partial, total_ordering
 import datetime
 
 
@@ -23,6 +25,52 @@ def create_connection():
         return con
     except Error:
         pass
+
+
+def table_col_info(cursor, table_name):  # return all available column names in a table
+    cursor.execute('PRAGMA TABLE_INFO({})'.format(table_name))
+    info = cursor.fetchall()
+    column_names = []
+    for col in info:
+        column_names.append(col[1])
+
+
+def CreateTable(conn, query):
+    try:
+        cursor_obj = conn.cursor()
+        cursor_obj.execute(query)
+        conn.commit()
+        return "success"
+    except Error:
+        return "failure"
+
+
+def deleterow(tablename, item_id):  # delete a row in a table
+    conn = create_connection()
+    delete_query = f"DELETE FROM {tablename} WHERE id={item_id}"
+    cursor_obj = conn.cursor()
+    cursor_obj.execute(delete_query)
+    conn.commit()
+    conn.close()
+
+
+def insertintotable(conn, query, value):
+    cursor = conn.cursor()
+    cursor.execute(query, tuple(value))
+    conn.commit()
+    print('Data Inserted successfully!')
+
+
+def fetchfromdb(conn, tablename='Project_Data'):
+    query = f"SELECT * FROM {tablename}"
+    curson_obj = conn.cursor()
+    curson_obj.execute(query)
+    rows = curson_obj.fetchall()
+
+    entry_list = []
+    for row in rows:
+        entry_list.append(row)
+    return entry_list
 
 
 class PersonalProject:
@@ -38,12 +86,15 @@ class PersonalProject:
         :param values:
         :return 'pass' or 'fail':
         """
-        columns = ['id', 'project_name', 'project_details', 'complete_status']
+        columns = ['id', 'project_name', 'project_details', 'complete_status', 'date_added', 'time_taken']
         Q = f"CREATE TABLE if not exists {self.tablename}({columns[0]} integer PRIMARY KEY,{columns[1]} text," \
-            f"{columns[2]} text, {columns[3]} text) "
+            f"{columns[2]} text, {columns[3]} text, {columns[4]} text, {columns[5]} text) "
         response = CreateTable(self.conn, Q)
         if response == 'success':
-            insert_Q = f"INSERT INTO {self.tablename}({columns[1]},{columns[2]},{columns[3]}) VALUES(?,?,?)"
+            date_add_string = datetime.datetime.strftime(datetime.datetime.today(), "%d.%m.%Y")
+            insert_Q = f"INSERT INTO {self.tablename}({columns[1]},{columns[2]},{columns[3]}, {columns[4]}) VALUES(?," \
+                       f"?,?,?) "
+            values.append(date_add_string)
             insertintotable(self.conn, insert_Q, values)
             return 'pass'
         else:
@@ -58,61 +109,34 @@ class PersonalProject:
         return entry_list
 
     def updateDB(self, item_id, value):
-        try:
-            columns = ['id', 'project_name', 'project_details', 'complete_status']
-            update_query = f'''UPDATE {self.tablename} SET {columns[1]}=?, {columns[2]}=?, {columns[3]}=? WHERE id= {item_id}'''
-            cursor_obj = self.conn.cursor()
-            cursor_obj.execute(update_query,value)
-            self.conn.commit()
-        except Exception as e:
-            print(f"{e}")
+        # try:
+        # see for complete status changes
+        cursor_obj = self.conn.cursor()
+        query = f"SELECT complete_status from {self.tablename} where id=?"
+        cursor_obj.execute(query, (item_id,))
+        data = cursor_obj.fetchone()[0]
+        if value[2] != data:  # data has been updated but complete status was different previously
+            # get the date added value
+            query = f"SELECT date_added from {self.tablename} where id=?"
+            cursor_obj.execute(query, (item_id,))
+            date_added = cursor_obj.fetchone()[0]  # stored in dd/mm/yyyy format
+            date_added_obj = datetime.datetime.strptime(date_added, "%d/%m/%Y")
+            present_date_obj = datetime.datetime.today()
+            difference_days = (present_date_obj - date_added_obj).days
+            # format time taken in days and months
+            time_taken_month = difference_days // 30  # month
+            time_taken_days = int(round(difference_days / 30 - time_taken_month, 1) * 30)
+            time_taken = f"{time_taken_days} days, {time_taken_month} months"
+            # update this timme taken in data base
+            query = f"UPDATE {self.tablename} SET time_taken=? WHERE id=?"
+            cursor_obj.execute(query, (time_taken, item_id))
+            self.conn.commit()  # commit the changes
+        # update time taken value
+        columns = ['id', 'project_name', 'project_details', 'complete_status', 'date_added', 'time_taken']
+        update_query = f'''UPDATE {self.tablename} SET {columns[1]}=?, {columns[2]}=?, {columns[3]}=? WHERE id= {item_id}'''
 
-
-def table_col_info(cursor, table_name):  # return all avaiaable column names in a table
-    cursor.execute('PRAGMA TABLE_INFO({})'.format(table_name))
-    info = cursor.fetchall()
-    column_names = []
-    for col in info:
-        column_names.append(col[1])
-
-
-def CreateTable(conn, query):
-    try:
-        cursor_obj = conn.cursor()
-        cursor_obj.execute(query)
-        conn.commit()
-        return "success"
-    # print('Table Successfully Created!')
-    except Error:
-        return "failure"
-
-
-def deleterow(tablename, item_id):  # delete a row in a table
-    conn = create_connection()
-    delete_query = f"DELETE FROM {tablename} WHERE id={item_id}"
-    cursor_obj = conn.cursor()
-    cursor_obj.execute(delete_query)
-    conn.commit()
-    conn.close()
-
-
-def insertintotable(conn, query, value):  # insert new rows into the table
-    cursor = conn.cursor()
-    cursor.execute(query, value)
-    conn.commit()
-    print('Data Inserted successfully!')
-
-
-def fetchfromdb(conn, tablename='Project_Data'):
-    query = f"SELECT * FROM {tablename} order by complete_status DESC;"
-    curson_obj = conn.cursor()
-    curson_obj.execute(query)
-    rows = curson_obj.fetchall()
-
-    entry_list = []
-    for row in rows:
-        entry_list.append(row)
-    return entry_list
+        cursor_obj.execute(update_query, tuple(value))
+        self.conn.commit()
 
 
 class EditDB(QMainWindow):
@@ -133,6 +157,7 @@ class EditDB(QMainWindow):
 
     def deleterow(self):
         deleterow(self.tablename, self.item_id)
+        self.returntoparent()
 
     def startupdate(self):
         updatedb = threading.Thread(target=self.updateDB)
@@ -148,12 +173,14 @@ class EditDB(QMainWindow):
         price = self.ui.lineEdit_price.text()
         submitdate = self.ui.lineEdit_submitdate.text()
         complete_status = self.ui.comboBox_completestatus.currentText()
+        payment_status = self.ui.comboBox_paymentstatus.currentText()
 
         try:
             update_query = f'''UPDATE Project_data SET project_name=?, definition=?, price=?, submitDate=?, 
-complete_status=? WHERE id=? '''
+complete_status=?, payment_cleared=? WHERE id=? '''
             cursor_obj.execute(update_query,
-                               tuple([project_name, definition, price, submitdate, complete_status, self.item_id]))
+                               tuple([project_name, definition, price, submitdate, complete_status, payment_status,
+                                      self.item_id]))
             conn.commit()
             print("DataBase Updated Successfully...")
             # return 1
@@ -171,11 +198,15 @@ complete_status=? WHERE id=? '''
         self.ui.lineEdit_projectname.setText(self.data_list[1])
         self.ui.lineEdit_price.setText(self.data_list[3])
         self.ui.lineEdit_submitdate.setText(self.data_list[4])
-        if self.data_list[-1] == 'complete':
+        if self.data_list[5] == 'complete':
             self.ui.comboBox_completestatus.setCurrentIndex(0)
         else:  # for pending case
             self.ui.comboBox_completestatus.setCurrentIndex(1)
         self.ui.textEdit_projectdef.setHtml(self.data_list[2])
+        if self.data_list[7].lower() == 'cleared':
+            self.ui.comboBox_paymentstatus.setCurrentIndex(1)  # payment
+        else:
+            self.ui.comboBox_paymentstatus.setCurrentIndex(0)  # payment
 
 
 class DetailsWindow(QDialog):
@@ -199,18 +230,21 @@ class EntryListing(QMainWindow):
         super().__init__()
         self.ui = entrylist.Ui_MainWindow()
         self.ui.setupUi(self)
-
-        self.data = data
+        if click != "on":
+            self.data = sorted(data, key=lambda date: datetime.datetime.strptime(date[4], "%d/%m/%Y"), reverse=True)  #
+        else:
+            self.data = sorted(data, key=lambda date: datetime.datetime.strptime(date[4], "%d.%m.%Y"), reverse=True)  #
+        # sort by submit date, data[4] is the submit date
         self.parented = parent
         for i in self.data:
             # display for pretty printing
-            display = f'{str(i[0])}.{i[1].center(80-len(i[1]))}{i[3].center(10-len(i[1])-len(i[3]))}'
-            # self.ui.item_list.addItem(f"{i[0]}.{i[1]} -- {i[3]}")
+            display = f'{str(i[0])}.{i[1].center(80 - len(i[1]))}{i[3].center(10 - len(i[1]) - len(i[3]))}'
             self.ui.item_list.addItem(display)
 
         self.ui.pushButton_cancel.clicked.connect(self.returntoparent)
+        self.ui.item_list.setSpacing(3)
 
-        if click != 'off' and click != 'Edit-Ideas':
+        if click != 'off' and click != 'Edit-Ideas':  # for click = on
             self.ui.item_list.itemClicked.connect(self.edit_db)
         elif click == 'Edit-Ideas':
             self.ui.item_list.itemClicked.connect(self.edit_ideas)
@@ -252,7 +286,7 @@ class FetchFromDataBase:
 
     def manage_operations(self):
         conn = create_connection()
-        self.entry_list = fetchfromdb(conn)
+        self.entry_list = fetchfromdb(conn)  # get all rows * all_cols from Project_Data
         self.parentwindow.ui.pushButton_editentriest.setEnabled(True)  # enable the edit button
         self.ShowEntryListWindow = EntryListing(self.parentwindow, self.entry_list)
         self.ShowEntryListWindow.show()
@@ -268,34 +302,31 @@ class AddToDataBase:
         self.manageOperations()
 
     def manageOperations(self):
-        query_insert = "INSERT INTO Project_Data(project_name,definition,price,submitDate,complete_status) VALUES(?," \
-                       "?,?,?,?) "
+        query_insert = "INSERT INTO Project_Data(project_name,definition,price,submitDate,complete_status,date_added, " \
+                       "payment_cleared) VALUES(?,?,?,?,?,?,?) "
         # id = self.share_dict['id']
         project_name = self.share_dict['project_name']
         definition = self.share_dict['definition']
         price = self.share_dict['price']
         submitDate = self.share_dict['submitDate']
         completestatus = self.share_dict['complete_status']
+        payment_status = self.share_dict['payment_status']
+        date_added = datetime.datetime.today().strftime("%d %B,%Y")
 
         conn = create_connection()
         cursor = conn.cursor()
         table_name = 'Project_Data'
-
-        # see if table exists or not
-        search_table = f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table_name}'"
-        search = cursor.execute(search_table)
-
-        if search.fetchone()[0] == 0:
-            query_create = "CREATE TABLE Project_Data(id integer PRIMARY KEY,project_name text, definition text, " \
-                           "price text, submitDate text, complete_status VARCHAR(30)) "
-            response = CreateTable(conn, query_create)
-            if response == 'success':
-                print("Table Created Successfully!")
-            else:
-                print("Cannot Create Table!")
-        else:  # insert into table, if table exists
-            value = [project_name, definition, price, submitDate, completestatus]
-            insertintotable(conn, query_insert, tuple(value))
+        query_create = f"CREATE TABLE IF NOT EXISTS {table_name}(id integer PRIMARY KEY,project_name text, " \
+                       f"definition text, price text, submitDate text, complete_status VARCHAR(30), date_added text, " \
+                       f"payment_cleared char(20)) "
+        response = CreateTable(conn, query_create)
+        if response == 'success':
+            print("Table Created Successfully!")
+        else:
+            print("Cannot Create Table!")
+        # insert into table after table is create if wasn't present
+        value = [project_name, definition, price, submitDate, completestatus, date_added, payment_status]
+        insertintotable(conn, query_insert, tuple(value))
 
 
 class ExploreWindow(QDialog):
@@ -313,14 +344,15 @@ class ExploreWindow(QDialog):
         curr_index = self.ui.options.currentIndex()
         display_text = ''
         tot_value = 0.0
+        flag_no_display = False
         if curr_index != 0:
             operation_type = self.ui.options.currentText()
             if 'pending jobs' in operation_type.lower():
                 conn = create_connection()
                 entry_list = fetchfromdb(conn)
-                for project in entry_list:
+                for project_count, project in enumerate(entry_list):
                     if project[5].lower().strip() == 'pending':
-                        display_text += f'{project[1]}\n'
+                        display_text += f'{project_count + 1}) <strong>{project[1]}</strong><br>'
                         if 'worth' in operation_type.lower():
                             worth = project[3]
                             if worth.strip(' USD').isdigit():
@@ -335,36 +367,50 @@ class ExploreWindow(QDialog):
             elif 'last submission' in operation_type.lower():
                 conn = create_connection()
                 entry_list = fetchfromdb(conn)
+                display_text = ''
+                entry_list = sorted(entry_list, key=lambda date: datetime.datetime.strptime(date[4], "%d.%m.%Y"),
+                                    reverse=True)
                 for project in entry_list:
-                    display_text = ''
-                    if project[-1] == 'complete':
+                    if project[5] == 'complete':  # get the last project completed
                         mod_list = list(map(str, project[1:]))
-                        for item in mod_list:
-                            display_text += f'<p>{item}</p>'
+                        category_text_list = ["Project Name", "Project Definition", "Project Amount", "Submit Date",
+                                              "Complete Status", "Date Added", "Payment Cleared"]
+                        for pos, item in enumerate(mod_list):
+                            category_text = category_text_list[pos]
+                            display_text += f'<p><strong><u>{category_text}:</u></strong>{item}</p>'
+                        break
                 display_text = 'You last submission details is as follows:<p>' + display_text + '</p>'
             elif 'nearest submission' in operation_type.lower():
-                min_diff = datetime.timedelta(0)
-                current_date = datetime.datetime.strptime(
-                    datetime.datetime.strftime(datetime.datetime.today(), '%d.%m.%Y'), '%d.%m.%Y')
+                min_diff = 0
+                current_date = datetime.datetime.today()  # today's date time object
                 conn = create_connection()
                 entry_list = fetchfromdb(conn)
                 for pos, project in enumerate(entry_list):
-                    submit_date = project[-2]
-                    complete_status = project[-1]
+                    submit_date = project[4]
+                    complete_status = project[5]
                     if complete_status == 'pending':
-                        print(submit_date)
                         submit_date = datetime.datetime.strptime(str(submit_date), '%d.%m.%Y')
-                        if min_diff == 0 and pos == 0:
-                            min_diff = current_date - submit_date
+                        if min_diff == 0:
+                            min_diff = submit_date - current_date
+                            # print(f"First case min_diff=={min_diff}")
+                            date_string = submit_date.strftime("%d %B, %Y")
+                            display_text = f'Project <strong>"{project[1]}"</strong> has to be submitted ' \
+                                           f'nearly.<br>Submission Date:<em>{date_string}</em>'  # project name
                         else:
-                            diff = current_date - submit_date
+                            print(16*'---')
+                            print(project[1])
+                            diff = submit_date - current_date
+                            print(f"min_diff:{min_diff}, diff:{diff}\n{submit_date}\n")
                             if diff < min_diff:
                                 min_diff = diff
-                                display_text = f'Project "{project[1]}" has to be submitted nearly.'  # project name
+                                date_string = submit_date.strftime("%d %B, %Y")
+                                display_text = f'Project <strong>"{project[1]}"</strong> has to be submitted ' \
+                                               f'nearly.<br>Submission Date:<em>{date_string}</em>'  # project name
+                            else:
+                                pass
                 if display_text == '':
                     display_text = "No Projects Left To be Submitted."
             elif 'highest individual worth' in operation_type.lower():
-                # print("I am here")
                 conn = create_connection()
                 entry_list = fetchfromdb(conn)
                 max_worth = 0.0
@@ -391,16 +437,95 @@ class ExploreWindow(QDialog):
                             check_pos += 1
                         else:
                             min_worth = worth
-                            print('min_worth=', min_worth)
                     elif worth < min_worth and worth != 0:
                         min_worth = worth
                         min_worth_project = project
                 display_text = f'Project with name: <strong>{min_worth_project}</strong>,' \
                                f'<br>Has the minimum worth of price <strong>{min_worth}</strong>'
+            elif 'show pending payments' in operation_type.lower():
+                conn = create_connection()
+                entry_list = fetchfromdb(conn)
+                total_price = 0
+                list_text = ""
+                for pos, project in enumerate(entry_list):
+                    worth = project[3]
+                    worth = int(worth.split(' ')[0]) * (72 if worth.split(' ')[-1] == 'USD' else 1)
+                    project_name = project[1]
+                    pending_status = project[7]
+                    if pending_status.lower() in ['pending', 'not cleared'] and project[5] == 'complete':
+                        # print(worth, project_name)
+                        list_text += f"<li>{project_name} -- (<strong>₹{worth}</strong>) <em>$ {worth//72}</em></li><br>"
+                        total_price += worth
+                display_text = f"<ul>{list_text}</ul><br><hr>Total Price Pending clearance = ₹{total_price} [$ {total_price//72}]"
+                print(f"Total price pending clearance=₹{total_price}")
+            elif 'show project ideas/personal projects' in operation_type.lower():
+                # open personal projects tab
+                self.parent_win.ui.actionSee_Ideas.trigger()
+                self.close()
+                flag_no_display = True
+            elif 'create report of all jobs (with time factor)' in operation_type.lower():
+                flag_no_display = True
+                display_text = self.follow_display_sequence()
+                self.displaywindow = DetailsWindow(display_text, self)
+                self.displaywindow.show()
+            if not flag_no_display:
+                self.displaywindow = DetailsWindow(display_text, self)
+                self.displaywindow.show()
 
-            self.displaywindow = DetailsWindow(display_text, self)
-            self.displaywindow.show()
-        # self.
+    def follow_display_sequence(self):
+        # search type
+        items = ['days', 'months']
+        item, okPressed = QInputDialog.getItem(self, "Search Parameter", "search by month/days back:", items, 0, False)
+        if okPressed and item:
+            # input constraint
+            max_value = 12 if item == 'months' else 30
+            text, okPressed = QInputDialog.getInt(self, "Get constraint", f"Price for _____ {item}",
+                                                  QLineEdit.Normal, 1,
+                                                  max=max_value)
+            if text and okPressed:
+                parameter = item
+                constraint = text
+
+                # perform db operation
+                conn = create_connection()
+                entrylist = fetchfromdb(conn)
+                tot_price = 0
+                projects = []
+                for entry in entrylist:
+                    submit_date = entry[4]
+                    date_object = datetime.datetime.strptime(submit_date, '%d.%m.%Y')
+                    present_date = datetime.datetime.today()
+
+                    difference = present_date - date_object
+                    if parameter == 'months' and entry[5] == 'complete':
+                        months = difference.days // 30
+                        if constraint >= months:
+                            projects.append(entry[1])
+                            price_box = entry[3]
+                            price = int(price_box.split(' ')[0])
+                            currency = price_box.split(' ')[1]
+                            if currency == 'USD':
+                                price = price * 71  # current dollar rate
+                            tot_price += price
+                            projects[-1] += f" --- (₹ {price})<br>"
+                    elif parameter == 'days' and entry[5] == 'complete':
+
+                        days = difference.days
+                        if constraint >= days:
+                            projects.append(entry[1])
+                            price_box = entry[3]
+                            price = int(price_box.split(' ')[0])
+                            currency = price_box.split(' ')[1]
+                            if currency == 'USD':
+                                price = price * 71  # current dollar rate
+                            tot_price += price
+                list_o = ''.join([f"<li>{project}</li>" for project in projects])
+                project_list = f"<ul>{list_o}</ul>"
+                display_text = f"Your total income for this period is <strong>₹ {tot_price}</strong><br><p>" \
+                               f"{project_list}</p>"
+                return display_text
+
+        # perform db operations
 
     def returnToParent(self):
         self.parent_win.show()
@@ -516,11 +641,11 @@ class manager_window(QMainWindow):
 
         self.ui.pushButton_completebytime.clicked.connect(self.accept_datetime)
         self.ui.pushButton_projectprice.clicked.connect(self.add_price)
-        self.ui.pushButton_editentriest.clicked.connect(self.load_file_path)
         self.ui.pushButton_completestatus.clicked.connect(self.getCompleteStatus)
         self.ui.pushButton_loadprojectdef.clicked.connect(self.accept_project_name)
         self.ui.pushButton_addproject.clicked.connect(self.settodatabase)
         self.ui.pushButton_editentriest.clicked.connect(self.edittodatabase)
+        self.ui.pushButton_paymentstatus.clicked.connect(self.getPaymentStatus)
 
         self.ui.actionNew_Idea.triggered.connect(self.addNewIdeas)
         self.ui.actionSee_Ideas.triggered.connect(self.showIdeas)
@@ -554,6 +679,12 @@ class manager_window(QMainWindow):
         self.ui.pushButton_editentriest.setDisabled(True)
         self.fetchdata = FetchFromDataBase(self)
 
+    def getPaymentStatus(self):
+        self.ui.pushButton_paymentstatus.setDisabled(True)
+        self.accept_window = AcceptWindow('payment_status')
+        self.accept_window.close_signal.connect(self.destroy_inputwindow)
+        self.hide()
+
     def getCompleteStatus(self):
         self.ui.pushButton_completestatus.setDisabled(True)
         self.accept_window = AcceptWindow('complete_status')
@@ -561,7 +692,8 @@ class manager_window(QMainWindow):
         self.hide()
 
     def settodatabase(self):
-        if len(self.input_dict.keys()) == 5:  # ['project_name,definition,price,submitDate,complete_status]
+        if len(self.input_dict.keys()) == 6:  # ['project_name,definition,price,submitDate,complete_status,
+            # payment_status]
             self.ui.textEdit_projectdefinition.clear()
 
             # write and reset

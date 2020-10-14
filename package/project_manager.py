@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'project_manager.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.0
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -45,24 +45,17 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.pushButton_completebytime = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_completebytime.setObjectName("pushButton_completebytime")
-        self.gridLayout.addWidget(self.pushButton_completebytime, 2, 2, 1, 1)
-        self.pushButton_completestatus = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_completestatus.setMinimumSize(QtCore.QSize(121, 61))
-        self.pushButton_completestatus.setObjectName("pushButton_completestatus")
-        self.gridLayout.addWidget(self.pushButton_completestatus, 0, 2, 1, 1)
-        self.pushButton_editentriest = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_editentriest.setObjectName("pushButton_editentriest")
-        self.gridLayout.addWidget(self.pushButton_editentriest, 3, 2, 1, 1)
-        self.pushButton_loadprojectdef = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_loadprojectdef.setToolTipDuration(2)
-        self.pushButton_loadprojectdef.setObjectName("pushButton_loadprojectdef")
-        self.gridLayout.addWidget(self.pushButton_loadprojectdef, 2, 0, 1, 1)
         self.pushButton_projectprice = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_projectprice.setToolTipDuration(-1)
         self.pushButton_projectprice.setObjectName("pushButton_projectprice")
         self.gridLayout.addWidget(self.pushButton_projectprice, 3, 0, 1, 1)
+        self.pushButton_completebytime = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_completebytime.setObjectName("pushButton_completebytime")
+        self.gridLayout.addWidget(self.pushButton_completebytime, 2, 2, 1, 1)
+        self.pushButton_loadprojectdef = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_loadprojectdef.setToolTipDuration(2)
+        self.pushButton_loadprojectdef.setObjectName("pushButton_loadprojectdef")
+        self.gridLayout.addWidget(self.pushButton_loadprojectdef, 2, 0, 1, 1)
         self.pushButton_addproject = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -71,6 +64,16 @@ class Ui_MainWindow(object):
         self.pushButton_addproject.setSizePolicy(sizePolicy)
         self.pushButton_addproject.setObjectName("pushButton_addproject")
         self.gridLayout.addWidget(self.pushButton_addproject, 0, 0, 1, 1)
+        self.pushButton_completestatus = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_completestatus.setMinimumSize(QtCore.QSize(121, 61))
+        self.pushButton_completestatus.setObjectName("pushButton_completestatus")
+        self.gridLayout.addWidget(self.pushButton_completestatus, 0, 2, 1, 1)
+        self.pushButton_editentriest = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_editentriest.setObjectName("pushButton_editentriest")
+        self.gridLayout.addWidget(self.pushButton_editentriest, 3, 2, 1, 1)
+        self.pushButton_paymentstatus = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_paymentstatus.setObjectName("pushButton_paymentstatus")
+        self.gridLayout.addWidget(self.pushButton_paymentstatus, 4, 2, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout)
         self.pushButton_addprojdef = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_addprojdef.setObjectName("pushButton_addprojdef")
@@ -88,6 +91,7 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QtCore.QRect(0, 0, 791, 22))
         self.menubar.setObjectName("menubar")
         self.menuMenu = QtWidgets.QMenu(self.menubar)
+        self.menuMenu.setFocusPolicy(QtCore.Qt.TabFocus)
         self.menuMenu.setObjectName("menuMenu")
         self.menuAdd_Project_Ideas = QtWidgets.QMenu(self.menubar)
         self.menuAdd_Project_Ideas.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
@@ -140,20 +144,21 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Project Manager-by Tuhin"))
+        self.pushButton_projectprice.setToolTip(_translate("MainWindow", "<html><head/><body><p>Adds the project price</p><p>none if not any</p></body></html>"))
+        self.pushButton_projectprice.setText(_translate("MainWindow", "DEFINE PROJECT PRICE"))
         self.pushButton_completebytime.setToolTip(_translate("MainWindow", "Add Project Deadline\n"
 "None If not any"))
         self.pushButton_completebytime.setText(_translate("MainWindow", "COMPLETE BY TIME"))
+        self.pushButton_loadprojectdef.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:9pt;\">Set  a short name to your project</span></p></body></html>"))
+        self.pushButton_loadprojectdef.setText(_translate("MainWindow", "LOAD PROJECT NAME"))
+        self.pushButton_addproject.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" color:#ff0000;\">PRESS THIS AT THE END</span></p><p><br/></p><p><span style=\" color:#000000;\">TO ADD THE PROJECT TO THE RECORDS</span></p></body></html>"))
+        self.pushButton_addproject.setText(_translate("MainWindow", "ADD PROJECT"))
         self.pushButton_completestatus.setToolTip(_translate("MainWindow", "Increases Project Counter\n"
 "Consider Given Details as Your OFFICIAL PROJECT category"))
         self.pushButton_completestatus.setText(_translate("MainWindow", "Set Complete Status"))
         self.pushButton_editentriest.setToolTip(_translate("MainWindow", "<html><head/><body><p>Edit Entries in already in the database</p></body></html>"))
         self.pushButton_editentriest.setText(_translate("MainWindow", "Edit Entries"))
-        self.pushButton_loadprojectdef.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:9pt;\">Set  a short name to your project</span></p></body></html>"))
-        self.pushButton_loadprojectdef.setText(_translate("MainWindow", "LOAD PROJECT NAME"))
-        self.pushButton_projectprice.setToolTip(_translate("MainWindow", "<html><head/><body><p>Adds the project price</p><p>none if not any</p></body></html>"))
-        self.pushButton_projectprice.setText(_translate("MainWindow", "DEFINE PROJECT PRICE"))
-        self.pushButton_addproject.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" color:#ff0000;\">PRESS THIS AT THE END</span></p><p><br/></p><p><span style=\" color:#000000;\">TO ADD THE PROJECT TO THE RECORDS</span></p></body></html>"))
-        self.pushButton_addproject.setText(_translate("MainWindow", "ADD PROJECT"))
+        self.pushButton_paymentstatus.setText(_translate("MainWindow", "Set Payment Status"))
         self.pushButton_addprojdef.setToolTip(_translate("MainWindow", "Add Written Definition To Records"))
         self.pushButton_addprojdef.setText(_translate("MainWindow", "ADD PROJECT\n"
 "DEFINITION"))

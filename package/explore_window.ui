@@ -117,7 +117,7 @@ font: 11pt &quot;URW Gothic L&quot;;</string>
          </item>
          <item>
           <property name="text">
-           <string>Create Report of All Jobs</string>
+           <string>Create Report of All Jobs (with time factor)</string>
           </property>
          </item>
         </widget>
