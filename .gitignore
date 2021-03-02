@@ -1,0 +1,5 @@
+manager_env/
+backup/
+.idea/
+__pycache__/
+*.db
