@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="bg_clip-art">
+    <file>on-computer.jpg</file>
+    <file>peeking.jpg</file>
+  </qresource>
+</RCC>
