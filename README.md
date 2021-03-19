@@ -22,7 +22,7 @@ Python Project To Manage Some Paid Projects For Freelancers Like Me.
 ## Requirements:
 - Python version 3.6+ installed
 - PyQt5 installed
-- Sqlite3 (in built since python 2.7)
+- Sqlite3 (in-built since python 2.7)
 
 ## What are the advanced features in it?
 - Advanced layout management in GUI windows using PyQt5
@@ -30,4 +30,4 @@ Python Project To Manage Some Paid Projects For Freelancers Like Me.
 - Threading to manage large amount of data in the database.
 - Attractive modern looking application using CSS type of styling in PyQt5 (Qt Designer)
 ## How Does the Opening Window Of The Window will Look Like?
-<img src="./image_files/Screenshot from 2020-05-30 05-16-02.png" width="550px">
+<img src="./images/project_manager_home.png" width="550px">
