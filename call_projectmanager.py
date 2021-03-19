@@ -255,8 +255,15 @@ class EntryListing(QMainWindow):
             self.data = sorted(data, key=lambda date: datetime.datetime.strptime(date[4], "%d.%m.%Y"), reverse=True)
         self.ui.item_list.clear()
         for i in self.data:
-            # display for pretty printing
-            display = f'{str(i[0])}.{i[1].center(80 - len(i[1]))}{i[3].center(10 - len(i[1]) - len(i[3]))}'
+            try:
+                display = '{id:<2}.{name:<45}{price:<20}{complete:<10}'.format(
+                    id=i[0],
+                    name=i[1],
+                    price=i[3],
+                    complete=i[5]
+                )
+            except TypeError:
+                pass
             self.ui.item_list.addItem(display)
 
     def edit_ideas(self, item):
