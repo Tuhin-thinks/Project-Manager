@@ -263,7 +263,7 @@ class EntryListing(QMainWindow):
                     complete=i[5]
                 )
             except TypeError:
-                pass
+                continue
             self.ui.item_list.addItem(display)
 
     def edit_ideas(self, item):
