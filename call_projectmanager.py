@@ -16,6 +16,7 @@ from package import edit_entries as EDIT
 from package import entrylist
 from package import explore_window
 from package import project_manager as PM
+from package.display_template import template_renderer
 
 
 def create_connection():
@@ -254,7 +255,12 @@ class EntryListing(QMainWindow):
         else:
             self.data = sorted(data, key=lambda date: datetime.datetime.strptime(date[4], "%d.%m.%Y"), reverse=True)
         self.ui.item_list.clear()
+        all_data = []
         for i in self.data:
+            temp = {
+                'id': i[0], "name": i[1], "price": i[3], "complete": i[5], 'payment': i[7]
+            }
+            all_data.append(temp)
             try:
                 display = '{id:<2}.{name:<45}{price:<20}{complete:<10}'.format(
                     id=i[0],
@@ -265,6 +271,7 @@ class EntryListing(QMainWindow):
             except TypeError:
                 continue
             self.ui.item_list.addItem(display)
+        template_renderer.render_template(all_data, ['id', 'name', 'price', 'complete', 'payment'])
 
     def edit_ideas(self, item):
         item_id = item.text().split('.')[0]

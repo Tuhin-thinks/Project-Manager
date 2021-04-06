@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block titleText %}Project Price Calculation{% endblock %}
+
+{% block body %}
+
+    <table class="table table-bordered border-primary">
+        <thead>
+            <tr>
+                {% for column in columns %}
+                    <th scope="col">{{column}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        {% for row in rows %}
+        {% if row['payment'].lower() == 'pending' %}
+            <tr class="table-warning">
+        {% else %}
+            <tr>
+        {% endif %}
+                {% for column in columns %}
+                    {% if loop.index == 1 %}
+                        <th scope="row">
+                            {{row[column]}}
+                        </th>
+                    {% else %}
+                        <td>
+                            {{row[column]}}
+                        </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
+{% block scripts %}
+    {{super()}}
+{% endblock %}
