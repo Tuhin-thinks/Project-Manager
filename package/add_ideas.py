@@ -107,7 +107,8 @@ class Ui_MainWindow(object):
         self.pushButton_add.setText(_translate("MainWindow", "Add"))
         self.pushButton_cancel.setText(_translate("MainWindow", "Cancel"))
         self.label.setText(_translate("MainWindow", "Give Your Idea A Call-Name:"))
-        self.lineEdit_projectname.setPlaceholderText(_translate("MainWindow", "In Short(under 30 characters),ex.: File Manager, Document Viewer"))
+        self.lineEdit_projectname.setPlaceholderText(_translate("MainWindow", "In Short(under 30 characters),ex.: "
+                                                                              "File Manager, Document Viewer"))
         self.label_2.setText(_translate("MainWindow", "Set Complete Status:"))
         self.comboBox_completestatus.setItemText(0, _translate("MainWindow", "pending"))
         self.comboBox_completestatus.setItemText(1, _translate("MainWindow", "complete"))
