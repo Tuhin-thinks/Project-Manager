@@ -3,3 +3,4 @@ backup/
 .idea/
 __pycache__/
 *.db
+temp.html
